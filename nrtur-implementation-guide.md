@@ -87,7 +87,24 @@ s.CreateViaLeadAPI(ctx, wsID, creatorID, in)
 
 ---
 
-## 3. The 3 Ingestion Pathways Explained
+## 3. Separation of Concerns: API Keys vs. Webhook Endpoints
+
+> [!NOTE]
+> **API Keys and Endpoints are Completely Decoupled:**
+> 1. **API Keys (Authentication & Identity):**
+>    * Created manually by the user via the `+ New key` button in the existing **Lead API** card.
+>    * Up to 10 active keys per workspace (`Default key`, `create Leads`, etc.).
+>    * Full lifecycle: Rename, Regenerate, Revoke.
+>    * The key's creator automatically becomes the Lead's owner in Nrtur.
+> 2. **Webhook Endpoints (Routing & Mapping):**
+>    * Created separately to define how an external payload is shaped (e.g. Shopify, Meta Lead Ads).
+>    * **Endpoints DO NOT generate separate keys.**
+>    * Any incoming request to a webhook endpoint MUST present one of the workspace's active API keys (`Authorization: Bearer <key>` or `?api_key=<key>`).
+>    * Requests without a valid API key are immediately rejected with `401 UNAUTHORIZED`.
+
+---
+
+## 4. The 3 Ingestion Pathways Explained
 
 | Pathway | Target Route | Sender Characteristics | How Mapping Works |
 | :--- | :--- | :--- | :--- |

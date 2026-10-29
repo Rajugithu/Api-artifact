@@ -52,23 +52,11 @@
 
     <!-- Nrtur Top App Bar -->
     <header class="border-b border-white/[0.08] bg-[#0d121d]/90 backdrop-blur sticky top-0 z-50 px-8 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-6">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center font-bold text-white shadow-md shadow-brand-500/20">
-            N
-          </div>
-          <span class="font-bold text-sm tracking-tight text-white">Nrtur</span>
-          <span class="text-white/30 text-xs">/</span>
-          <span class="text-xs text-white/60">Workspace Settings</span>
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center font-bold text-white shadow-md shadow-brand-500/20">
+          N
         </div>
-
-        <div class="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-white/[0.06] text-xs">
-          <div class="px-3 py-1 text-white/50 hover:text-white/80 cursor-pointer transition">General</div>
-          <div class="px-3 py-1 text-white/50 hover:text-white/80 cursor-pointer transition">Members</div>
-          <div class="px-3 py-1 bg-white/[0.08] text-white font-medium rounded-lg shadow-sm border border-white/[0.08]">Integrations</div>
-          <div class="px-3 py-1 text-white/50 hover:text-white/80 cursor-pointer transition">Custom Fields</div>
-          <div class="px-3 py-1 text-white/50 hover:text-white/80 cursor-pointer transition">Billing</div>
-        </div>
+        <span class="font-bold text-sm tracking-tight text-white">Settings</span>
       </div>
 
       <div class="flex items-center gap-3">
@@ -124,40 +112,99 @@
           </div>
         </div>
 
-        <!-- CARD 1: EXISTING NRTUR LEAD API CARD (SCRUM-1241, SCRUM-1305) -->
-        <div class="rounded-2xl border border-white/[0.08] bg-black/30 p-6 space-y-5">
+        <!-- CARD 1: EXISTING NRTUR LEAD API CARD (Exact Match to Production Screenshot) -->
+        <div class="rounded-2xl border border-white/[0.08] bg-[#0f1420]/80 p-6 space-y-5">
           <div class="flex items-start justify-between">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-white/80">
-                <i data-lucide="key-round" class="w-5 h-5 text-brand-400"></i>
+            <div class="flex items-center gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <i data-lucide="key-round" class="w-5 h-5"></i>
               </div>
               <div>
-                <div class="flex items-center gap-2">
-                  <h3 class="text-sm font-semibold text-white">Lead API</h3>
-                  <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-white/[0.05] text-white/60 border border-white/[0.06]">POST /api/public/v1/leads</span>
-                </div>
-                <p class="text-xs text-white/45 mt-0.5">
-                  Allows outside systems (website forms, Zapier, Make) to create leads in Nrtur's native 8-field schema.
+                <h3 class="text-sm font-semibold text-white">Lead API</h3>
+                <p class="text-xs text-white/50 mt-0.5">
+                  Create leads from outside nrtur: website forms, Zapier or Make, ad tools and partners. The API creates leads only. It can't read, edit or delete anything.
                 </p>
               </div>
             </div>
-            <button @click="showDocsDrawer = true" class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 text-[12px] font-medium text-white/70 hover:bg-white/[0.07] hover:text-white transition">
-              <i data-lucide="notebook-text" class="w-3.5 h-3.5"></i>
-              View Lead API Docs
-            </button>
+          </div>
+
+          <!-- API KEYS Section -->
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between text-[11px] font-medium tracking-[0.14em] text-white/45 uppercase">
+              <span>API KEYS · 2 of 10 active</span>
+              <button class="flex items-center gap-1.5 px-3 py-1 bg-white/[0.04] hover:bg-white/[0.08] text-white/90 text-xs font-semibold rounded-lg border border-white/[0.08] transition">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i> New key
+              </button>
+            </div>
+
+            <div class="space-y-2">
+              <div class="rounded-xl border border-white/[0.08] bg-black/40 p-3.5 flex items-center justify-between">
+                <div class="space-y-0.5">
+                  <div class="text-xs font-bold text-white">Default key</div>
+                  <div class="text-[11px] font-mono text-white/50">nrtur_live_UZ4Y...</div>
+                </div>
+                <div class="text-xs text-white/45 text-center">
+                  Created by Qamar Ul Islam · Oct 16, 2026
+                </div>
+                <div class="flex items-center gap-6">
+                  <span class="text-xs text-white/40">Last used 13d ago</span>
+                  <span class="text-xs font-mono text-white/70">0 leads (30d)</span>
+                  <button class="text-white/40 hover:text-white p-1">
+                    <i data-lucide="more-horizontal" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="rounded-xl border border-white/[0.08] bg-black/40 p-3.5 flex items-center justify-between">
+                <div class="space-y-0.5">
+                  <div class="text-xs font-bold text-white">create Leads</div>
+                  <div class="text-[11px] font-mono text-white/50">nrtur_live_Vo0Q...</div>
+                </div>
+                <div class="text-xs text-white/45 text-center">
+                  Created by Qamar Ul Islam · Oct 28, 2026
+                </div>
+                <div class="flex items-center gap-6">
+                  <span class="text-xs text-white/40">Last used 20h ago</span>
+                  <span class="text-xs font-mono text-emerald-400 font-bold">18 leads (30d)</span>
+                  <button class="text-white/40 hover:text-white p-1">
+                    <i data-lucide="more-horizontal" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Endpoint Display -->
           <div>
             <p class="mb-1.5 text-[11px] font-medium tracking-[0.14em] text-white/45 uppercase">Endpoint</p>
             <div class="flex flex-wrap items-center gap-2 sm:flex-nowrap">
-              <div class="flex min-w-0 flex-1 items-center gap-2 overflow-hidden rounded-xl border border-white/[0.08] bg-black/30 px-3 py-2 font-mono text-[12px] text-white/80">
-                <span class="shrink-0 rounded-[6px] bg-brand-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-brand-300">POST</span>
-                <span class="truncate">https://api.nrtur.io/api/public/v1/leads</span>
+              <div class="flex min-w-0 flex-1 items-center gap-2 overflow-hidden rounded-xl border border-white/[0.08] bg-black/40 px-3 py-2.5 font-mono text-[12px] text-white/80">
+                <span class="shrink-0 rounded-[6px] bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-400">POST</span>
+                <span class="truncate">https://staging-api.nrtur.io/api/public/v1/leads</span>
               </div>
-              <button @click="copy('https://api.nrtur.io/api/public/v1/leads')" class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 text-[12px] font-medium text-white/70 hover:text-white">
+              <button @click="copy('https://staging-api.nrtur.io/api/public/v1/leads')" class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 text-[12px] font-medium text-white/70 hover:text-white transition">
                 <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy
               </button>
+              <button @click="showDocsDrawer = true" class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 text-[12px] font-medium text-white/70 hover:bg-white/[0.07] hover:text-white transition">
+                <i data-lucide="notebook-text" class="w-3.5 h-3.5"></i>
+                View API docs
+              </button>
+            </div>
+            <p class="mt-1.5 text-[11px] text-white/40">
+              Send a key as <span class="font-mono text-white/60">Authorization: Bearer &lt;key&gt;</span> with a JSON body. Name or email is required.
+            </p>
+          </div>
+
+          <!-- Allow duplicate leads row -->
+          <div class="flex items-center justify-between p-3.5 rounded-xl border border-white/[0.06] bg-black/20">
+            <div>
+              <div class="text-xs font-semibold text-white">Allow duplicate leads</div>
+              <div class="text-[11px] text-white/40">
+                When on, an API lead is created even if its email or phone matches an existing lead. A match with a contact's email is always refused.
+              </div>
+            </div>
+            <div class="w-9 h-5 bg-emerald-500 rounded-full p-0.5 flex items-center justify-end cursor-pointer">
+              <div class="w-4 h-4 bg-white rounded-full shadow-sm"></div>
             </div>
           </div>
         </div>
@@ -218,6 +265,12 @@
                     <button @click="copy(wh.endpointUrl)" class="p-1.5 text-white/50 hover:text-white rounded-lg bg-white/[0.04] border border-white/[0.08] transition" title="Copy URL">
                       <i data-lucide="copy" class="w-3.5 h-3.5"></i>
                     </button>
+                  </div>
+
+                  <!-- Separate Auth Requirement -->
+                  <div class="flex items-center gap-2 pt-1 text-[11px] text-white/50">
+                    <span>Authentication:</span>
+                    <span class="text-white/70">Send any active key from the <strong>API Keys</strong> section above via <code class="font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">Authorization: Bearer &lt;key&gt;</code> or <code class="font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">?api_key=&lt;key&gt;</code></span>
                   </div>
                 </div>
 
@@ -513,6 +566,15 @@
               <option value="generic">Generic JSON Webhook</option>
             </select>
           </div>
+          <div class="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] text-white/50 text-[11px] space-y-1">
+            <div class="text-white/80 font-semibold flex items-center gap-1.5">
+              <i data-lucide="key" class="w-3.5 h-3.5 text-emerald-400"></i>
+              API Key Authentication
+            </div>
+            <p>
+              This endpoint does not generate a separate key. It will accept requests authenticated with <strong>any active workspace key</strong> from your <strong>API Keys</strong> list above.
+            </p>
+          </div>
           <div class="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] text-white/50 text-[11px]">
             Target: <code class="text-brand-300">/api/public/v1/webhooks/:id</code>. Pre-seeded with mapper template converting <code class="text-white/70">first_name + last_name</code> to Nrtur's single <code class="text-brand-300">name</code> field.
           </div>
@@ -544,6 +606,7 @@
         const showDocsDrawer = ref(false);
         const newWhName = ref('');
         const newWhProvider = ref('shopify');
+        const newWhKey = ref('create Leads');
         const toastMsg = ref('');
 
         const documentedFields = [
@@ -562,6 +625,9 @@
             id: 'wh_shp_78a1',
             name: 'Shopify Store Customers',
             provider: 'shopify',
+            linkedKeyName: 'create Leads',
+            linkedKeyPrefix: 'nrtur_live_Vo0Q...',
+            linkedKeyOwner: 'Qamar Ul Islam',
             tagColor: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
             endpointUrl: 'https://api.nrtur.io/api/public/v1/webhooks/wh_shp_78a1',
             rulesCount: 6,
@@ -571,10 +637,25 @@
             id: 'wh_fb_882c',
             name: 'Meta Facebook Lead Ads',
             provider: 'meta',
+            linkedKeyName: 'create Leads',
+            linkedKeyPrefix: 'nrtur_live_Vo0Q...',
+            linkedKeyOwner: 'Qamar Ul Islam',
             tagColor: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
             endpointUrl: 'https://api.nrtur.io/api/public/v1/webhooks/wh_fb_882c',
             rulesCount: 6,
             leadsCreated30d: 840
+          },
+          {
+            id: 'wh_str_11b9',
+            name: 'Stripe Checkout Ingestion',
+            provider: 'stripe',
+            linkedKeyName: 'Default key',
+            linkedKeyPrefix: 'nrtur_live_UZ4Y...',
+            linkedKeyOwner: 'Qamar Ul Islam',
+            tagColor: 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20',
+            endpointUrl: 'https://api.nrtur.io/api/public/v1/webhooks/wh_str_11b9',
+            rulesCount: 5,
+            leadsCreated30d: 120
           }
         ]);
 
@@ -719,18 +800,24 @@
         const createWebhook = () => {
           if (!newWhName.value) return;
           const id = 'wh_' + newWhProvider.value.slice(0, 3) + '_' + Math.random().toString(36).substring(2, 6);
+          const colorMap = {
+            shopify: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
+            meta: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
+            stripe: 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20',
+            generic: 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
+          };
           webhooks.value.unshift({
             id: id,
             name: newWhName.value,
             provider: newWhProvider.value,
-            tagColor: newWhProvider.value === 'shopify' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
+            tagColor: colorMap[newWhProvider.value] || 'bg-slate-500/10 text-slate-400 border border-slate-500/20',
             endpointUrl: `https://api.nrtur.io/api/public/v1/webhooks/${id}`,
             rulesCount: 6,
             leadsCreated30d: 0
           });
           showNewWebhookModal.value = false;
           newWhName.value = '';
-          triggerToast(`Created dynamic endpoint: ${id}`);
+          triggerToast(`Created endpoint ${id}. Uses your workspace API keys.`);
           nextTick(() => lucide.createIcons());
         };
 
@@ -773,6 +860,7 @@
           documentedFields,
           newWhName,
           newWhProvider,
+          newWhKey,
           webhooks,
           currentEditingWebhook,
           sourcePayloadJson,
