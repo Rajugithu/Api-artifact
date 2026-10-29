@@ -71,7 +71,7 @@
     </header>
 
     <!-- Main Container: Settings > Integrations Page -->
-    <main class="flex-1 max-w-6xl w-full mx-auto p-8 space-y-8">
+    <main :class="activeView === 'studio' ? 'max-w-[1720px]' : 'max-w-6xl'" class="flex-1 w-full mx-auto p-6 md:p-8 space-y-8 transition-all duration-300">
 
       <!-- Breadcrumbs & Heading -->
       <div class="border-b border-white/[0.06] pb-5 flex items-end justify-between">
@@ -351,7 +351,7 @@
         </div>
 
         <!-- 3 Columns: Source -> Mapper -> Nrtur Lead Object -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
           <!-- Col 1: Raw External Payload -->
           <div class="lg:col-span-4 bg-black/40 rounded-2xl border border-white/[0.08] flex flex-col h-[740px] overflow-hidden">
@@ -375,7 +375,7 @@
           </div>
 
           <!-- Col 2: Nrtur Lead Field Mapping Rules -->
-          <div class="lg:col-span-5 bg-black/40 rounded-2xl border border-white/[0.08] flex flex-col h-[740px] overflow-hidden">
+          <div class="lg:col-span-4 xl:col-span-4 bg-black/40 rounded-2xl border border-white/[0.08] flex flex-col h-[740px] overflow-hidden">
             <div class="px-4 py-3 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <i data-lucide="git-merge" class="w-4 h-4 text-brand-400"></i>
@@ -455,7 +455,7 @@
           </div>
 
           <!-- Col 3: Canonical Nrtur Lead Entity -->
-          <div class="lg:col-span-3 bg-black/40 rounded-2xl border border-white/[0.08] flex flex-col h-[740px] overflow-hidden">
+          <div class="lg:col-span-4 xl:col-span-4 bg-black/40 rounded-2xl border border-white/[0.08] flex flex-col h-[740px] overflow-hidden">
             <div class="px-4 py-3 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <i data-lucide="check-circle" class="w-4 h-4 text-brand-400"></i>
@@ -464,8 +464,8 @@
               <span class="text-[10px] font-mono text-brand-300">Spec 0.175.0</span>
             </div>
 
-            <div class="p-3 flex-1 flex flex-col bg-black/50 overflow-auto">
-              <pre class="text-brand-300 font-mono text-xs leading-relaxed p-1">{{ JSON.stringify(transformedLead, null, 2) }}</pre>
+            <div class="p-4 flex-1 flex flex-col bg-black/60 overflow-x-auto overflow-y-auto min-w-0">
+              <pre class="text-emerald-300 font-mono text-xs leading-relaxed whitespace-pre select-all p-1">{{ JSON.stringify(transformedLead, null, 2) }}</pre>
             </div>
 
             <div class="p-4 bg-white/[0.02] border-t border-white/[0.08] space-y-2">
