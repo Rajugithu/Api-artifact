@@ -101,17 +101,6 @@
       <!-- ================= VIEW 1: SETTINGS INTEGRATIONS CARD VIEW ================= -->
       <div v-if="activeView === 'card'" class="space-y-6">
 
-        <!-- Critical Architecture Callout: Single 'name' vs First/Last Name -->
-        <div class="rounded-xl border border-amber-500/30 bg-amber-500/[0.06] p-4 flex items-start gap-3.5">
-          <i data-lucide="info" class="w-5 h-5 text-amber-400 shrink-0 mt-0.5"></i>
-          <div class="text-xs space-y-1">
-            <p class="font-semibold text-amber-300">Nrtur Core Architecture Rule: Single <code class="font-mono font-bold bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-500/30 text-amber-200">name</code> Field for Leads</p>
-            <p class="text-amber-200/80 leading-relaxed">
-              In Nrtur, Contacts have <code class="font-mono">first_name</code> and <code class="font-mono">last_name</code>, but <strong>Leads accept a single <code class="font-mono">name</code> field</strong> (<code class="font-mono">dto.PublicCreateLeadRequest.name</code>). External services (Shopify, Meta) that send separate first and last names must be mapped/concatenated into Nrtur's single <code class="font-mono">name</code> field before <code class="font-mono">CreateViaLeadAPI</code> is executed.
-            </p>
-          </div>
-        </div>
-
         <!-- CARD 1: EXISTING NRTUR LEAD API CARD (Exact Match to Production Screenshot) -->
         <div class="rounded-2xl border border-white/[0.08] bg-[#0f1420]/80 p-6 space-y-5">
           <div class="flex items-start justify-between">
