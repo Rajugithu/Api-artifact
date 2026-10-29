@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WebhookFlow — Dynamic Ingestion & Payload Mapping Engine</title>
+  <title>Nrtur — Settings › Integrations › Dynamic Webhooks & Ingestion</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Google Fonts -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- Vue 3 -->
   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
   <script>
@@ -25,12 +25,14 @@
           },
           colors: {
             brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
+              300: '#a5b4fc',
+              400: '#818cf8',
               500: '#6366f1',
               600: '#4f46e5',
-              700: '#4338ca',
-            }
+            },
+            accent: {
+              violet: '#8b5cf6',
+            },
           }
         }
       }
@@ -38,426 +40,453 @@
   </script>
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    pre, code, textarea.font-mono { font-family: 'JetBrains Mono', monospace; }
-    /* Custom scrollbars */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #f1f5f9; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    pre, code, textarea.font-mono, input.font-mono { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+<body class="bg-[#0b0f17] text-white/90 min-h-screen flex flex-col selection:bg-brand-500/30 selection:text-white">
   <div id="app" class="flex-1 flex flex-col">
 
-    <!-- Top Navigation Bar -->
-    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50 px-6 py-3.5 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-          <i data-lucide="git-merge" class="w-5 h-5 text-white"></i>
+    <!-- Nrtur Top App Bar -->
+    <header class="border-b border-white/[0.08] bg-[#0d121d]/90 backdrop-blur sticky top-0 z-50 px-8 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center font-bold text-white shadow-md shadow-brand-500/20">
+          N
         </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 class="text-base font-bold text-white tracking-tight">WebhookFlow</h1>
-            <span class="text-[10px] font-semibold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded-full border border-indigo-500/20">Architecture Prototype</span>
-          </div>
-          <p class="text-xs text-slate-400">Dynamic Ingestion & Schema Transformation Studio</p>
-        </div>
+        <span class="font-bold text-sm tracking-tight text-white">Settings</span>
       </div>
 
-      <!-- Navigation Tabs -->
-      <nav class="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
-        <button 
-          @click="activeTab = 'mapper'"
-          :class="activeTab === 'mapper' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'"
-          class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all">
-          <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
-          <span>Visual Mapper Studio</span>
-        </button>
-        <button 
-          @click="activeTab = 'endpoints'"
-          :class="activeTab === 'endpoints' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'"
-          class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all">
-          <i data-lucide="webhook" class="w-4 h-4"></i>
-          <span>Dynamic Endpoints</span>
-          <span class="px-1.5 py-0.2 bg-slate-800 text-[10px] rounded-full text-slate-300 font-mono">{{ endpoints.length }}</span>
-        </button>
-        <button 
-          @click="activeTab = 'architecture'"
-          :class="activeTab === 'architecture' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'"
-          class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all">
-          <i data-lucide="network" class="w-4 h-4"></i>
-          <span>3 Pathways Spec</span>
-        </button>
-      </nav>
-
-      <!-- Action items -->
       <div class="flex items-center gap-3">
-        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          Transformation Engine Ready
+        <div class="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] text-xs text-white/70">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>Backend Lead API Contract (Spec 0.175.0)</span>
         </div>
-        <button @click="showShareModal = true" class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-700 transition">
-          <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
-          Share With Team
-        </button>
+        <div class="w-8 h-8 rounded-full bg-white/[0.08] border border-white/10 flex items-center justify-center text-xs font-semibold text-white/80">
+          AK
+        </div>
       </div>
     </header>
 
-    <!-- MAIN BODY -->
-    <main class="flex-1 overflow-auto p-6 max-w-[1700px] w-full mx-auto">
+    <!-- Main Container: Settings > Integrations Page -->
+    <main :class="activeView === 'studio' ? 'max-w-[1720px]' : 'max-w-6xl'" class="flex-1 w-full mx-auto p-6 md:p-8 space-y-8 transition-all duration-300">
 
-      <!-- ================= TAB 1: VISUAL MAPPER STUDIO ================= -->
-      <div v-if="activeTab === 'mapper'" class="space-y-6">
-
-        <!-- Banner / Presets bar -->
-        <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-950/60 p-4 rounded-2xl border border-slate-800/80">
-          <div class="flex items-center gap-3">
-            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Select Example Source:</span>
-            <div class="flex gap-2">
-              <button 
-                @click="loadPreset('shopify')"
-                :class="selectedPreset === 'shopify' ? 'bg-indigo-600/30 border-indigo-500 text-indigo-300' : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'"
-                class="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg border transition">
-                <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i>
-                Shopify Customer Webhook
-              </button>
-              <button 
-                @click="loadPreset('facebook')"
-                :class="selectedPreset === 'facebook' ? 'bg-indigo-600/30 border-indigo-500 text-indigo-300' : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'"
-                class="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg border transition">
-                <i data-lucide="users" class="w-3.5 h-3.5"></i>
-                Facebook Lead Ad Payload
-              </button>
-              <button 
-                @click="loadPreset('custom')"
-                :class="selectedPreset === 'custom' ? 'bg-indigo-600/30 border-indigo-500 text-indigo-300' : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'"
-                class="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg border transition">
-                <i data-lucide="code" class="w-3.5 h-3.5"></i>
-                Custom Partner CRM
-              </button>
-            </div>
+      <!-- Breadcrumbs & Heading -->
+      <div class="border-b border-white/[0.06] pb-5 flex items-end justify-between">
+        <div>
+          <div class="flex items-center gap-2 text-xs text-white/50 mb-1">
+            <span>Settings</span>
+            <span>/</span>
+            <span class="text-brand-300">Integrations</span>
           </div>
-
-          <div class="flex items-center gap-3">
-            <div class="text-xs text-slate-400">Target Schema:</div>
-            <select v-model="targetSchema" class="bg-slate-900 border border-slate-800 rounded-lg text-xs font-semibold text-slate-200 px-3 py-1.5 focus:outline-none focus:border-indigo-500">
-              <option value="Lead">Lead Canonical Entity (6 fields)</option>
-              <option value="Customer">Customer Canonical Entity (8 fields)</option>
-            </select>
-            <button @click="runTransformation" class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-1.5 rounded-lg shadow-md shadow-indigo-600/25 transition">
-              <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
-              Transform Live
-            </button>
-          </div>
-        </div>
-
-        <!-- 3-Column Interactive Studio -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-
-          <!-- Left Column: Source Payload Input -->
-          <div class="lg:col-span-4 bg-slate-950/70 rounded-2xl border border-slate-800 overflow-hidden flex flex-col h-[680px]">
-            <div class="px-4 py-3 bg-slate-900/80 border-b border-slate-800 flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <div class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></div>
-                <span class="text-xs font-bold text-slate-200">Raw Incoming Payload</span>
-                <span class="text-[10px] text-slate-500 font-mono">(JSON)</span>
-              </div>
-              <button @click="formatSourceJson" class="text-[11px] text-slate-400 hover:text-slate-200 hover:underline">Format JSON</button>
-            </div>
-            <div class="p-3 bg-slate-950 flex-1 relative flex flex-col">
-              <textarea 
-                v-model="sourcePayloadText" 
-                @input="onSourcePayloadChange"
-                class="w-full h-full bg-transparent text-emerald-400 font-mono text-xs leading-relaxed resize-none focus:outline-none p-2 selection:bg-indigo-500/30"
-                spellcheck="false"></textarea>
-            </div>
-            <div class="px-4 py-2.5 bg-slate-900/60 border-t border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
-              <span>Status: <span :class="isValidSourceJson ? 'text-emerald-400' : 'text-rose-400 font-semibold'">{{ isValidSourceJson ? 'Valid JSON' : 'Syntax Error' }}</span></span>
-              <span class="font-mono text-slate-500">{{ detectedFieldCount }} fields detected</span>
-            </div>
-          </div>
-
-          <!-- Middle Column: Dynamic Mapping Rules Builder -->
-          <div class="lg:col-span-4 bg-slate-950/70 rounded-2xl border border-slate-800 overflow-hidden flex flex-col h-[680px]">
-            <div class="px-4 py-3 bg-slate-900/80 border-b border-slate-800 flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <div class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></div>
-                <span class="text-xs font-bold text-slate-200">Dynamic Mapping Rules</span>
-                <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-mono">{{ mappingRules.length }} rules</span>
-              </div>
-              <button @click="addNewRule" class="flex items-center gap-1 text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold">
-                <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
-                Add Rule
-              </button>
-            </div>
-
-            <!-- Rules list -->
-            <div class="p-4 flex-1 overflow-y-auto space-y-3.5">
-              <div 
-                v-for="(rule, index) in mappingRules" 
-                :key="index"
-                class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 relative hover:border-slate-700 transition">
-                <div class="flex items-center justify-between mb-2">
-                  <div class="flex items-center gap-2">
-                    <span class="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 text-[10px] font-bold flex items-center justify-center font-mono">{{ index + 1 }}</span>
-                    <span class="text-xs font-bold text-slate-300">Map to:</span>
-                    <span class="text-xs font-mono font-semibold text-indigo-400 bg-indigo-950/60 px-2 py-0.5 rounded border border-indigo-800/40">{{ rule.targetField }}</span>
-                  </div>
-                  <button @click="removeRule(index)" class="text-slate-500 hover:text-rose-400 transition">
-                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                  </button>
-                </div>
-
-                <div class="grid grid-cols-1 gap-2 text-xs">
-                  <div>
-                    <label class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Source JSONPath</label>
-                    <input 
-                      v-model="rule.sourcePath" 
-                      @input="runTransformation"
-                      type="text" 
-                      class="w-full mt-1 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs font-mono text-amber-300 focus:outline-none focus:border-indigo-500"
-                      placeholder="e.g. customer.first_name">
-                  </div>
-
-                  <div class="grid grid-cols-2 gap-2 mt-1">
-                    <div>
-                      <label class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Transform</label>
-                      <select 
-                        v-model="rule.transform" 
-                        @change="runTransformation"
-                        class="w-full mt-1 bg-slate-950 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-indigo-500">
-                        <option value="none">Direct Copy</option>
-                        <option value="concat">Concat with another field</option>
-                        <option value="uppercase">Uppercase</option>
-                        <option value="lowercase">Lowercase</option>
-                        <option value="to_number">Cast to Number</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Default / Fallback</label>
-                      <input 
-                        v-model="rule.defaultValue" 
-                        @input="runTransformation"
-                        type="text" 
-                        class="w-full mt-1 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-indigo-500"
-                        placeholder="null">
-                    </div>
-                  </div>
-
-                  <!-- Concat extra field if selected -->
-                  <div v-if="rule.transform === 'concat'" class="mt-1 bg-slate-950/60 p-2 rounded-lg border border-indigo-500/20">
-                    <label class="text-[10px] uppercase font-bold text-indigo-400 tracking-wider">Secondary Concat Path</label>
-                    <input 
-                      v-model="rule.concatWith" 
-                      @input="runTransformation"
-                      type="text" 
-                      class="w-full mt-1 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1 text-xs font-mono text-amber-300 focus:outline-none"
-                      placeholder="e.g. customer.last_name">
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="px-4 py-2.5 bg-slate-900/60 border-t border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
-              <span>Automatic real-time re-mapping</span>
-              <button @click="resetToDefaultRules" class="text-indigo-400 hover:underline">Reset Rules</button>
-            </div>
-          </div>
-
-          <!-- Right Column: Normalized Output (Canonical Entity) -->
-          <div class="lg:col-span-4 bg-slate-950/70 rounded-2xl border border-slate-800 overflow-hidden flex flex-col h-[680px]">
-            <div class="px-4 py-3 bg-slate-900/80 border-b border-slate-800 flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <div class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></div>
-                <span class="text-xs font-bold text-slate-200">Transformed Canonical Entity</span>
-                <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-mono font-bold">{{ targetSchema }}</span>
-              </div>
-              <span class="text-[11px] text-slate-400 font-mono">200 OK</span>
-            </div>
-
-            <!-- Output json -->
-            <div class="p-3 bg-slate-950 flex-1 relative overflow-auto">
-              <pre class="text-indigo-300 font-mono text-xs leading-relaxed p-2">{{ formattedTransformedOutput }}</pre>
-            </div>
-
-            <div class="p-4 bg-slate-900/80 border-t border-slate-800 space-y-2">
-              <div class="flex items-center justify-between text-xs">
-                <span class="text-slate-400">Database Ingestion Target:</span>
-                <span class="font-mono text-slate-200 font-bold">leads_collection</span>
-              </div>
-              <div class="flex items-center justify-between text-xs">
-                <span class="text-slate-400">Processing Latency:</span>
-                <span class="font-mono text-emerald-400 font-bold">~ 2.4 ms (Engine Core)</span>
-              </div>
-              <button 
-                @click="simulatePushToDatabase" 
-                :disabled="isPushed"
-                :class="isPushed ? 'bg-emerald-600 text-white' : 'bg-slate-800 hover:bg-slate-700 text-slate-200'"
-                class="w-full mt-2 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition">
-                <i :data-lucide="isPushed ? 'check' : 'database'" class="w-4 h-4"></i>
-                <span>{{ isPushed ? 'Persisted to Database Successfully!' : 'Simulate Database Insert' }}</span>
-              </button>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- ================= TAB 2: DYNAMIC ENDPOINTS MANAGER ================= -->
-      <div v-if="activeTab === 'endpoints'" class="space-y-6">
-
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-lg font-bold text-white tracking-tight">Active Dynamic Webhook Endpoints</h2>
-            <p class="text-xs text-slate-400">Each third-party provider receives a dedicated URL bound to its respective mapping configuration.</p>
-          </div>
-          <button @click="showNewEndpointModal = true" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-lg shadow-indigo-600/20 transition">
-            <i data-lucide="plus" class="w-4 h-4"></i>
-            Create New Webhook Endpoint
-          </button>
-        </div>
-
-        <!-- Endpoints Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          <div 
-            v-for="ep in endpoints" 
-            :key="ep.id"
-            class="bg-slate-950/80 rounded-2xl border border-slate-800 p-5 flex flex-col justify-between hover:border-slate-700 transition">
-            
-            <div>
-              <div class="flex items-start justify-between mb-3">
-                <div class="flex items-center gap-2.5">
-                  <div :class="ep.providerColor" class="w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold text-xs shadow-sm">
-                    {{ ep.provider.slice(0, 2).toUpperCase() }}
-                  </div>
-                  <div>
-                    <h3 class="text-sm font-bold text-white">{{ ep.name }}</h3>
-                    <span class="text-[10px] text-slate-400 capitalize">{{ ep.provider }} Integration</span>
-                  </div>
-                </div>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold" :class="ep.isActive ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800 text-slate-500'">
-                  {{ ep.isActive ? 'Active' : 'Paused' }}
-                </span>
-              </div>
-
-              <!-- URL Box -->
-              <div class="bg-slate-900 border border-slate-800 rounded-xl p-2.5 my-3 flex items-center justify-between">
-                <code class="text-[11px] text-indigo-400 font-mono truncate mr-2">{{ ep.url }}</code>
-                <button @click="copyToClipboard(ep.url)" class="text-slate-400 hover:text-white transition p-1">
-                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                </button>
-              </div>
-
-              <!-- Metadata pills -->
-              <div class="flex flex-wrap gap-2 my-3 text-[11px]">
-                <div class="bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800/80 text-slate-300">
-                  Target: <strong class="text-white">{{ ep.targetEntity }}</strong>
-                </div>
-                <div class="bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800/80 text-slate-300">
-                  Rules: <strong class="text-white">{{ ep.ruleCount }} fields mapped</strong>
-                </div>
-                <div class="bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800/80 text-slate-300">
-                  HMAC: <strong class="text-emerald-400">{{ ep.hasHmac ? 'Enabled' : 'None' }}</strong>
-                </div>
-              </div>
-            </div>
-
-            <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-              <span class="text-slate-500 text-[11px]">Calls: <strong class="text-slate-300">{{ ep.callCount.toLocaleString() }}</strong></span>
-              <div class="flex items-center gap-2">
-                <button @click="testEndpoint(ep)" class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 text-slate-200 text-[11px] font-semibold rounded-lg border border-slate-800 transition">Test</button>
-                <button @click="loadEndpointIntoMapper(ep)" class="px-2.5 py-1 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 text-[11px] font-semibold rounded-lg border border-indigo-500/30 transition">Edit Mapping</button>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-
-      <!-- ================= TAB 3: THE 3 INGESTION PATHWAYS ARCHITECTURE ================= -->
-      <div v-if="activeTab === 'architecture'" class="space-y-6">
-
-        <div class="bg-gradient-to-r from-indigo-950/40 via-purple-950/20 to-slate-950 p-6 rounded-2xl border border-indigo-500/20">
-          <h2 class="text-base font-bold text-white mb-1">Architecture Comparison: The 3 Ingestion Pathways</h2>
-          <p class="text-xs text-slate-300 leading-relaxed max-w-3xl">
-            As highlighted in the audio discussion, different external partners have different integration capabilities. Our architecture solves this with three distinct ingestion pathways.
+          <h1 class="text-xl font-bold text-white tracking-tight">Lead Ingestion & Webhooks</h1>
+          <p class="text-xs text-white/50 mt-1">
+            Manage public lead creation keys, webhook endpoints, and dynamic field mappings into Nrtur's canonical 8-field Lead model.
           </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="flex items-center gap-2">
+          <button @click="activeView = 'card'" :class="activeView === 'card' ? 'bg-white/[0.1] text-white font-semibold' : 'text-white/50 hover:text-white'" class="px-3 py-1.5 rounded-lg text-xs border border-white/[0.08] transition">
+            Settings Card View
+          </button>
+          <button @click="activeView = 'studio'" :class="activeView === 'studio' ? 'bg-brand-500 text-white font-semibold shadow-md shadow-brand-500/20' : 'text-white/50 hover:text-white'" class="px-3 py-1.5 rounded-lg text-xs border border-brand-500/30 transition flex items-center gap-1.5">
+            <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
+            Field Mapping Studio
+          </button>
+        </div>
+      </div>
 
-          <!-- Pathway 1 -->
-          <div class="bg-slate-950/80 rounded-2xl border border-slate-800 p-5 flex flex-col justify-between">
-            <div>
-              <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center font-bold text-xs mb-3">01</div>
-              <h3 class="text-sm font-bold text-white">Pathway 1: Canonical Endpoint</h3>
-              <p class="text-xs text-slate-400 mt-1 mb-4">Caller already formats their request to strictly match our native internal entity schema.</p>
+      <!-- ================= VIEW 1: SETTINGS INTEGRATIONS CARD VIEW ================= -->
+      <div v-if="activeView === 'card'" class="space-y-6">
 
-              <div class="space-y-2 text-xs">
-                <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800 font-mono text-[11px] text-blue-300">
-                  POST /api/v1/ingest/canonical
-                </div>
-                <ul class="text-slate-400 text-xs space-y-1.5 list-disc list-inside">
-                  <li>No transformation engine pass required</li>
-                  <li>Direct JSON schema validation</li>
-                  <li>Fastest processing path (&lt; 1ms)</li>
-                </ul>
+        <!-- CARD 1: EXISTING NRTUR LEAD API CARD (Exact Match to Production Screenshot) -->
+        <div class="rounded-2xl border border-white/[0.08] bg-[#0f1420]/80 p-6 space-y-5">
+          <div class="flex items-start justify-between">
+            <div class="flex items-center gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <i data-lucide="key-round" class="w-5 h-5"></i>
               </div>
-            </div>
-
-            <div class="mt-6 pt-3 border-t border-slate-800/80 text-[11px] text-slate-500">
-              Ideal for: Internal microservices, official mobile apps
+              <div>
+                <h3 class="text-sm font-semibold text-white">Lead API</h3>
+                <p class="text-xs text-white/50 mt-0.5">
+                  Create leads from outside nrtur: website forms, Zapier or Make, ad tools and partners. The API creates leads only. It can't read, edit or delete anything.
+                </p>
+              </div>
             </div>
           </div>
 
-          <!-- Pathway 2 -->
-          <div class="bg-slate-950/80 rounded-2xl border border-slate-800 p-5 flex flex-col justify-between">
-            <div>
-              <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center font-bold text-xs mb-3">02</div>
-              <h3 class="text-sm font-bold text-white">Pathway 2: In-Payload Mapping</h3>
-              <p class="text-xs text-slate-400 mt-1 mb-4">Caller passes the raw payload AND the dynamic field-mapping rules in the same request.</p>
-
-              <div class="space-y-2 text-xs">
-                <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800 font-mono text-[11px] text-amber-300">
-                  POST /api/v1/ingest/dynamic
-                </div>
-                <ul class="text-slate-400 text-xs space-y-1.5 list-disc list-inside">
-                  <li>Body includes <code>data</code> and <code>mapping</code> block</li>
-                  <li>Zero pre-configuration needed in database</li>
-                  <li>Extreme flexibility for developer API clients</li>
-                </ul>
-              </div>
+          <!-- API KEYS Section -->
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between text-[11px] font-medium tracking-[0.14em] text-white/45 uppercase">
+              <span>API KEYS · 2 of 10 active</span>
+              <button class="flex items-center gap-1.5 px-3 py-1 bg-white/[0.04] hover:bg-white/[0.08] text-white/90 text-xs font-semibold rounded-lg border border-white/[0.08] transition">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i> New key
+              </button>
             </div>
 
-            <div class="mt-6 pt-3 border-t border-slate-800/80 text-[11px] text-slate-500">
-              Ideal for: Zapier, Make.com, custom middleware clients
+            <div class="space-y-2">
+              <div class="rounded-xl border border-white/[0.08] bg-black/40 p-3.5 flex items-center justify-between">
+                <div class="space-y-0.5">
+                  <div class="text-xs font-bold text-white">Default key</div>
+                  <div class="text-[11px] font-mono text-white/50">nrtur_live_UZ4Y...</div>
+                </div>
+                <div class="text-xs text-white/45 text-center">
+                  Created by Qamar Ul Islam · Oct 16, 2026
+                </div>
+                <div class="flex items-center gap-6">
+                  <span class="text-xs text-white/40">Last used 13d ago</span>
+                  <span class="text-xs font-mono text-white/70">0 leads (30d)</span>
+                  <button class="text-white/40 hover:text-white p-1">
+                    <i data-lucide="more-horizontal" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="rounded-xl border border-white/[0.08] bg-black/40 p-3.5 flex items-center justify-between">
+                <div class="space-y-0.5">
+                  <div class="text-xs font-bold text-white">create Leads</div>
+                  <div class="text-[11px] font-mono text-white/50">nrtur_live_Vo0Q...</div>
+                </div>
+                <div class="text-xs text-white/45 text-center">
+                  Created by Qamar Ul Islam · Oct 28, 2026
+                </div>
+                <div class="flex items-center gap-6">
+                  <span class="text-xs text-white/40">Last used 20h ago</span>
+                  <span class="text-xs font-mono text-emerald-400 font-bold">18 leads (30d)</span>
+                  <button class="text-white/40 hover:text-white p-1">
+                    <i data-lucide="more-horizontal" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Pathway 3 -->
-          <div class="bg-slate-950/80 rounded-2xl border border-indigo-500/30 p-5 flex flex-col justify-between relative shadow-lg shadow-indigo-950/50">
-            <span class="absolute top-4 right-4 bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">Core Audio Focus</span>
-            <div>
-              <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 border border-indigo-500/40 flex items-center justify-center font-bold text-xs mb-3">03</div>
-              <h3 class="text-sm font-bold text-white">Pathway 3: Dynamic Endpoints</h3>
-              <p class="text-xs text-slate-400 mt-1 mb-4">Dedicated URLs for platforms that send fixed payloads without mapping capability.</p>
+          <!-- Endpoint Display -->
+          <div>
+            <p class="mb-1.5 text-[11px] font-medium tracking-[0.14em] text-white/45 uppercase">Endpoint</p>
+            <div class="flex flex-wrap items-center gap-2 sm:flex-nowrap">
+              <div class="flex min-w-0 flex-1 items-center gap-2 overflow-hidden rounded-xl border border-white/[0.08] bg-black/40 px-3 py-2.5 font-mono text-[12px] text-white/80">
+                <span class="shrink-0 rounded-[6px] bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-400">POST</span>
+                <span class="truncate">https://staging-api.nrtur.io/api/public/v1/leads</span>
+              </div>
+              <button @click="copy('https://staging-api.nrtur.io/api/public/v1/leads')" class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 text-[12px] font-medium text-white/70 hover:text-white transition">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy
+              </button>
+              <button @click="showDocsDrawer = true" class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 text-[12px] font-medium text-white/70 hover:bg-white/[0.07] hover:text-white transition">
+                <i data-lucide="notebook-text" class="w-3.5 h-3.5"></i>
+                View API docs
+              </button>
+            </div>
+            <p class="mt-1.5 text-[11px] text-white/40">
+              Send a key as <span class="font-mono text-white/60">Authorization: Bearer &lt;key&gt;</span> with a JSON body. Name or email is required.
+            </p>
+          </div>
 
-              <div class="space-y-2 text-xs">
-                <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800 font-mono text-[11px] text-indigo-300">
-                  POST /api/v1/webhooks/:endpoint_id
+          <!-- Allow duplicate leads row -->
+          <div class="flex items-center justify-between p-3.5 rounded-xl border border-white/[0.06] bg-black/20">
+            <div>
+              <div class="text-xs font-semibold text-white">Allow duplicate leads</div>
+              <div class="text-[11px] text-white/40">
+                When on, an API lead is created even if its email or phone matches an existing lead. A match with a contact's email is always refused.
+              </div>
+            </div>
+            <div class="w-9 h-5 bg-emerald-500 rounded-full p-0.5 flex items-center justify-end cursor-pointer">
+              <div class="w-4 h-4 bg-white rounded-full shadow-sm"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 2: NEW DYNAMIC WEBHOOKS & INGESTION CARD (PROPOSAL SCRUM-1420) -->
+        <div class="rounded-2xl border border-brand-500/30 bg-gradient-to-b from-[#131929]/95 to-black/50 p-6 shadow-2xl space-y-6">
+          <div class="flex items-start justify-between">
+            <div class="flex items-center gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-accent-violet flex items-center justify-center text-white shadow-lg shadow-brand-500/20">
+                <i data-lucide="webhook" class="w-5 h-5 text-white"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2.5">
+                  <h2 class="text-base font-bold text-white tracking-tight">Dynamic Webhook Endpoints & Payload Mapping</h2>
+                  <span class="text-[10px] font-semibold uppercase tracking-wider bg-brand-500/20 text-brand-300 px-2 py-0.5 rounded-full border border-brand-500/30">Pathway 3</span>
                 </div>
-                <ul class="text-slate-400 text-xs space-y-1.5 list-disc list-inside">
-                  <li>User generates endpoint (Shopify, Meta, etc.)</li>
-                  <li>Mapping retrieved from database by ID</li>
-                  <li>Automatic HMAC security verification</li>
-                </ul>
+                <p class="text-xs text-white/50 mt-0.5 max-w-2xl">
+                  Connect third-party webhook senders that cannot format their JSON to Nrtur's schema. Each endpoint holds a saved mapping rule that transforms arbitrary external payloads directly into Nrtur's 8 canonical Lead API fields.
+                </p>
               </div>
             </div>
 
-            <div class="mt-6 pt-3 border-t border-slate-800/80 text-[11px] text-slate-500">
-              Ideal for: Shopify, Meta Ads, Stripe, WooCommerce
+            <button @click="showNewWebhookModal = true" class="inline-flex items-center gap-1.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold px-3.5 py-2 transition shadow-md shadow-brand-500/25">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Create Webhook Endpoint</span>
+            </button>
+          </div>
+
+          <!-- Webhooks Table -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between text-xs font-semibold text-white/45 tracking-[0.14em] uppercase">
+              <span>Configured Provider Endpoints ({{ webhooks.length }} active)</span>
+              <span>Target Entity: Lead (Canonical 8 Fields)</span>
+            </div>
+
+            <div class="space-y-2.5">
+              <div 
+                v-for="wh in webhooks" 
+                :key="wh.id"
+                class="rounded-xl border border-white/[0.08] bg-black/40 p-4 hover:border-white/20 transition flex flex-col md:flex-row md:items-center justify-between gap-4">
+                
+                <div class="space-y-1.5 flex-1 min-w-0">
+                  <div class="flex items-center gap-2.5">
+                    <span :class="wh.tagColor" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider font-mono">
+                      {{ wh.provider }}
+                    </span>
+                    <span class="text-xs font-semibold text-white truncate">{{ wh.name }}</span>
+                    <span class="text-[10px] text-white/40 font-mono">ID: {{ wh.id }}</span>
+                    <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Active</span>
+                  </div>
+
+                  <!-- URL Box -->
+                  <div class="flex items-center gap-2 max-w-xl">
+                    <div class="flex min-w-0 flex-1 items-center gap-2 overflow-hidden rounded-lg border border-white/[0.08] bg-black/50 px-2.5 py-1.5 font-mono text-[11.5px] text-brand-300">
+                      <span class="text-white/40 select-none">POST</span>
+                      <span class="truncate">{{ wh.endpointUrl }}</span>
+                    </div>
+                    <button @click="copy(wh.endpointUrl)" class="p-1.5 text-white/50 hover:text-white rounded-lg bg-white/[0.04] border border-white/[0.08] transition" title="Copy URL">
+                      <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                    </button>
+                  </div>
+
+                  <!-- Separate Auth Requirement -->
+                  <div class="flex items-center gap-2 pt-1 text-[11px] text-white/50">
+                    <span>Authentication:</span>
+                    <span class="text-white/70">Send any active key from the <strong>API Keys</strong> section above via <code class="font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">Authorization: Bearer &lt;key&gt;</code> or <code class="font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">?api_key=&lt;key&gt;</code></span>
+                  </div>
+                </div>
+
+                <!-- Stats and Action Buttons -->
+                <div class="flex items-center gap-3 shrink-0">
+                  <div class="text-right">
+                    <div class="text-xs font-bold text-white font-mono">{{ wh.leadsCreated30d }} leads created</div>
+                    <div class="text-[10px] text-white/40">{{ wh.rulesCount }} rules mapped to Lead</div>
+                  </div>
+
+                  <button @click="openMapperStudio(wh)" class="inline-flex h-8 items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.05] px-3 text-[11px] font-medium text-white/80 hover:bg-white/[0.1] hover:text-white transition">
+                    <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5 text-brand-400"></i>
+                    Edit Mapping
+                  </button>
+
+                  <button @click="simulateWebhookDelivery(wh)" class="inline-flex h-8 items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 text-[11px] font-semibold text-emerald-300 hover:bg-emerald-500/20 transition">
+                    <i data-lucide="play" class="w-3 h-3 fill-current"></i>
+                    Test Ingest
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- 3 Pathways Architecture Comparison in Nrtur -->
+          <div class="border-t border-white/[0.08] pt-4 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+            <div class="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-1">
+              <div class="font-semibold text-white/80 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                Pathway 1: Native Lead API
+              </div>
+              <p class="text-[11px] text-white/45">
+                Target: <code class="text-blue-300">/api/public/v1/leads</code>. Caller sends the exact 8-field Nrtur JSON directly with single <code class="text-white/70">name</code>.
+              </p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-1">
+              <div class="font-semibold text-white/80 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                Pathway 2: In-Payload Mapping
+              </div>
+              <p class="text-[11px] text-white/45">
+                Target: <code class="text-amber-300">/api/public/v1/leads/dynamic</code>. Caller sends raw data along with an inline <code class="text-white/70">_mapping</code> block.
+              </p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-brand-500/[0.04] border border-brand-500/30 space-y-1">
+              <div class="font-semibold text-brand-300 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-brand-400"></span>
+                Pathway 3: Dynamic Endpoints
+              </div>
+              <p class="text-[11px] text-white/45">
+                Target: <code class="text-brand-300">/api/public/v1/webhooks/:id</code>. Third party pushes fixed payload (e.g. Shopify); Nrtur resolves DB mapping rules.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ================= VIEW 2: INTERACTIVE FIELD MAPPER STUDIO ================= -->
+      <div v-if="activeView === 'studio'" class="space-y-6">
+
+        <!-- Studio Header -->
+        <div class="flex items-center justify-between bg-black/40 p-4 rounded-2xl border border-white/[0.08]">
+          <div class="flex items-center gap-4">
+            <button @click="activeView = 'card'" class="p-2 rounded-lg bg-white/[0.05] border border-white/[0.08] text-white/70 hover:text-white transition">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            </button>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-sm font-bold text-white tracking-tight">Lead Field Mapping Studio</h2>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-brand-500/20 text-brand-300 border border-brand-500/30">{{ currentEditingWebhook.name }}</span>
+              </div>
+              <p class="text-xs text-white/50">
+                Transforms incoming payload into Nrtur's exact 8-field <code class="text-white/80">PublicCreateLeadRequest</code>.
+              </p>
+            </div>
+          </div>
+
+          <!-- Presets -->
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-white/45">Load Payload Preset:</span>
+            <button @click="loadPreset('shopify')" :class="selectedPreset === 'shopify' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 font-semibold' : 'bg-black/30 text-white/60 border-white/[0.08]'" class="px-2.5 py-1 text-xs rounded-lg border transition">Shopify Customer</button>
+            <button @click="loadPreset('meta')" :class="selectedPreset === 'meta' ? 'bg-blue-500/20 text-blue-300 border-blue-500/40 font-semibold' : 'bg-black/30 text-white/60 border-white/[0.08]'" class="px-2.5 py-1 text-xs rounded-lg border transition">Meta Lead Ad</button>
+          </div>
+        </div>
+
+        <!-- 3 Columns: Source -> Mapper -> Nrtur Lead Object -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+          <!-- Col 1: Raw External Payload -->
+          <div class="lg:col-span-4 bg-black/40 rounded-2xl border border-white/[0.08] flex flex-col h-[740px] overflow-hidden">
+            <div class="px-4 py-3 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i data-lucide="file-json" class="w-4 h-4 text-emerald-400"></i>
+                <span class="text-xs font-semibold text-white/90">External Raw Payload</span>
+              </div>
+              <span class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">JSON</span>
+            </div>
+            <div class="p-3 flex-1 flex flex-col bg-black/50">
+              <textarea 
+                v-model="sourcePayloadJson" 
+                @input="applyTransformation"
+                class="w-full h-full bg-transparent text-emerald-300 font-mono text-xs leading-relaxed resize-none focus:outline-none p-1"
+                spellcheck="false"></textarea>
+            </div>
+            <div class="p-3 bg-white/[0.02] border-t border-white/[0.08] text-[11px] text-white/40">
+              Notice external providers send <code class="text-emerald-300">first_name</code> & <code class="text-emerald-300">last_name</code>.
+            </div>
+          </div>
+
+          <!-- Col 2: Nrtur Lead Field Mapping Rules -->
+          <div class="lg:col-span-4 xl:col-span-4 bg-black/40 rounded-2xl border border-white/[0.08] flex flex-col h-[740px] overflow-hidden">
+            <div class="px-4 py-3 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i data-lucide="git-merge" class="w-4 h-4 text-brand-400"></i>
+                <span class="text-xs font-semibold text-white/90">Canonical Nrtur Mapping Rules</span>
+              </div>
+              <span class="text-[10px] text-white/40 font-mono">Exactly 8 Lead Fields Allowed</span>
+            </div>
+
+            <div class="p-4 flex-1 overflow-y-auto space-y-3.5">
+              <div 
+                v-for="(rule, rIdx) in nrturRules" 
+                :key="rIdx"
+                class="rounded-xl border border-white/[0.08] bg-white/[0.02] p-3.5 space-y-2.5 hover:border-brand-500/40 transition">
+                
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-mono text-white/40">#{{ rIdx + 1 }}</span>
+                    <span class="text-xs font-semibold text-white/90">Target:</span>
+                    <select v-model="rule.nrturField" @change="applyTransformation" class="bg-black/60 border border-white/[0.12] rounded-lg text-xs font-mono font-semibold text-brand-300 px-2 py-1 focus:outline-none focus:border-brand-500">
+                      <option value="name">name (Single Full Name — Required*)</option>
+                      <option value="email">email (Primary Email — Required*)</option>
+                      <option value="phone">phone (7–15 digits)</option>
+                      <option value="company_name">company_name</option>
+                      <option value="job_title">job_title</option>
+                      <option value="source">source (Must match allowedLeadSources)</option>
+                      <option value="estimated_value">estimated_value (Decimal string)</option>
+                      <option value="notes">notes (Becomes timeline note)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <div>
+                    <label class="text-[10px] font-semibold text-white/40 uppercase tracking-wider">Source JSONPath</label>
+                    <input 
+                      v-model="rule.sourcePath" 
+                      @input="applyTransformation"
+                      type="text" 
+                      class="w-full mt-1 bg-black/60 border border-white/[0.08] rounded-lg px-2.5 py-1.5 text-xs font-mono text-amber-300 focus:outline-none focus:border-brand-500" 
+                      placeholder="e.g. customer.first_name">
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-2">
+                    <div>
+                      <label class="text-[10px] font-semibold text-white/40 uppercase tracking-wider">Transform</label>
+                      <select v-model="rule.transform" @change="applyTransformation" class="w-full mt-1 bg-black/60 border border-white/[0.08] rounded-lg px-2 py-1 text-xs text-white/80 focus:outline-none">
+                        <option value="none">Direct String Pass</option>
+                        <option value="concat">Combine with second field (into single name)</option>
+                        <option value="uppercase">Uppercase</option>
+                        <option value="decimal_string">Cast to Decimal String ("5000.00")</option>
+                        <option value="source_normalize">Normalize to Nrtur Source ("API", "Ad")</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="text-[10px] font-semibold text-white/40 uppercase tracking-wider">Default / Fallback</label>
+                      <input v-model="rule.defaultValue" @input="applyTransformation" type="text" class="w-full mt-1 bg-black/60 border border-white/[0.08] rounded-lg px-2 py-1 text-xs text-white/80 focus:outline-none" placeholder="null">
+                    </div>
+                  </div>
+
+                  <!-- Concat secondary field (Crucial for first_name + last_name -> name) -->
+                  <div v-if="rule.transform === 'concat'" class="bg-brand-500/10 p-2.5 rounded-lg border border-brand-500/30 space-y-1">
+                    <div class="flex items-center justify-between text-[10px] font-semibold text-brand-300 uppercase tracking-wider">
+                      <span>Secondary Concat JSONPath</span>
+                      <span class="text-brand-400 font-mono">Mapped to single 'name'</span>
+                    </div>
+                    <input v-model="rule.concatPath" @input="applyTransformation" type="text" class="w-full mt-1 bg-black/50 border border-brand-500/30 rounded-lg px-2.5 py-1 text-xs font-mono text-amber-200" placeholder="e.g. customer.last_name">
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="p-3 bg-white/[0.02] border-t border-white/[0.08] flex items-center justify-between text-xs">
+              <span class="text-white/45">Saved to: {{ currentEditingWebhook.id }}</span>
+              <button @click="saveMapping" class="px-3 py-1.5 bg-brand-500 hover:bg-brand-600 text-white rounded-lg font-semibold transition">Save Mapping</button>
+            </div>
+          </div>
+
+          <!-- Col 3: Canonical Nrtur Lead Entity -->
+          <div class="lg:col-span-4 xl:col-span-4 bg-black/40 rounded-2xl border border-white/[0.08] flex flex-col h-[740px] overflow-hidden">
+            <div class="px-4 py-3 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i data-lucide="check-circle" class="w-4 h-4 text-brand-400"></i>
+                <span class="text-xs font-semibold text-white/90">Nrtur PublicCreateLeadRequest</span>
+              </div>
+              <span class="text-[10px] font-mono text-brand-300">Spec 0.175.0</span>
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col bg-black/60 overflow-x-auto overflow-y-auto min-w-0">
+              <pre class="text-emerald-300 font-mono text-xs leading-relaxed whitespace-pre select-all p-1">{{ JSON.stringify(transformedLead, null, 2) }}</pre>
+            </div>
+
+            <div class="p-4 bg-white/[0.02] border-t border-white/[0.08] space-y-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-white/45">Identity Check:</span>
+                <span :class="isLeadValid ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold'">
+                  {{ isLeadValid ? 'Passed (name/email present)' : 'Failed (name or email required)' }}
+                </span>
+              </div>
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-white/45">Service Execution:</span>
+                <span class="text-white/80 font-mono text-[11px]">CreateViaLeadAPI</span>
+              </div>
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-white/45">Side Effects:</span>
+                <span class="text-white/60 text-[10px]">Timeline note created, cap checked</span>
+              </div>
+              <button @click="simulateCreateLead" class="w-full mt-2 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-950">
+                <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
+                Simulate Ingestion
+              </button>
             </div>
           </div>
 
@@ -467,73 +496,90 @@
 
     </main>
 
-    <!-- NEW ENDPOINT MODAL -->
-    <div v-if="showNewEndpointModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-base font-bold text-white">Create Dynamic Webhook Endpoint</h3>
-          <button @click="showNewEndpointModal = false" class="text-slate-400 hover:text-white">
+    <!-- LEAD API DOCS DRAWER MODAL -->
+    <div v-if="showDocsDrawer" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex justify-end">
+      <div class="bg-[#101522] border-l border-white/[0.1] max-w-xl w-full h-full p-6 shadow-2xl flex flex-col overflow-y-auto space-y-5">
+        <div class="flex items-center justify-between pb-3 border-b border-white/[0.08]">
+          <div>
+            <h3 class="text-sm font-bold text-white">Lead API Documentation</h3>
+            <p class="text-xs text-white/45">POST /api/public/v1/leads canonical schema</p>
+          </div>
+          <button @click="showDocsDrawer = false" class="text-white/40 hover:text-white p-1">
             <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
 
-        <div class="space-y-3.5 text-xs">
-          <div>
-            <label class="font-semibold text-slate-300">Endpoint Name</label>
-            <input v-model="newEp.name" type="text" class="w-full mt-1 bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-indigo-500" placeholder="e.g. Meta Lead Campaign 2026">
-          </div>
-          <div>
-            <label class="font-semibold text-slate-300">Provider</label>
-            <select v-model="newEp.provider" class="w-full mt-1 bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-indigo-500">
-              <option value="shopify">Shopify</option>
-              <option value="facebook">Meta / Facebook</option>
-              <option value="stripe">Stripe</option>
-              <option value="generic">Generic / Other</option>
-            </select>
-          </div>
-          <div>
-            <label class="font-semibold text-slate-300">Target Canonical Entity</label>
-            <select v-model="newEp.targetEntity" class="w-full mt-1 bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-indigo-500">
-              <option value="Lead">Lead</option>
-              <option value="Customer">Customer</option>
-              <option value="Order">Order</option>
-            </select>
+        <div class="space-y-4 text-xs">
+          <p class="text-white/70 leading-relaxed">
+            Nrtur accepts <strong>only 8 fields</strong> on the Lead API. Notice there are <strong>no first_name or last_name fields</strong>:
+          </p>
+
+          <div class="space-y-2">
+            <div v-for="f in documentedFields" :key="f.name" class="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] space-y-1">
+              <div class="flex items-center justify-between">
+                <code class="text-brand-300 font-mono font-bold">{{ f.name }}</code>
+                <span class="text-[10px] px-1.5 py-0.5 rounded font-mono" :class="f.required === 'Required*' ? 'bg-amber-500/15 text-amber-300' : 'bg-white/[0.05] text-white/50'">{{ f.required }}</span>
+              </div>
+              <p class="text-white/60 text-[11px]">{{ f.desc }}</p>
+            </div>
           </div>
         </div>
 
-        <div class="mt-6 flex items-center justify-end gap-2">
-          <button @click="showNewEndpointModal = false" class="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white">Cancel</button>
-          <button @click="createEndpoint" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition">Create & Get URL</button>
-        </div>
+        <button @click="showDocsDrawer = false" class="w-full py-2.5 bg-white/[0.08] hover:bg-white/[0.12] text-white rounded-xl text-xs font-semibold transition">
+          Close Docs
+        </button>
       </div>
     </div>
 
-    <!-- SHARE MODAL -->
-    <div v-if="showShareModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl">
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="text-base font-bold text-white">Share Prototype With Team</h3>
-          <button @click="showShareModal = false" class="text-slate-400 hover:text-white">
-            <i data-lucide="x" class="w-5 h-5"></i>
+    <!-- NEW WEBHOOK MODAL -->
+    <div v-if="showNewWebhookModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-[#121722] border border-white/[0.1] rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-white">Create Dynamic Webhook Endpoint</h3>
+          <button @click="showNewWebhookModal = false" class="text-white/40 hover:text-white">
+            <i data-lucide="x" class="w-4 h-4"></i>
           </button>
         </div>
-        <p class="text-xs text-slate-400 mb-4">
-          This standalone file is saved directly at <code class="text-indigo-400 font-mono">D:\Nature\Artifact\index.html</code>. Anyone with browser access can open this file directly without needing an npm build or local server.
-        </p>
-        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between mb-4">
-          <span class="text-xs font-mono text-slate-300 truncate">D:\Nature\Artifact\index.html</span>
-          <button @click="copyToClipboard('D:\\Nature\\Artifact\\index.html')" class="text-indigo-400 hover:text-indigo-300 text-xs font-semibold flex items-center gap-1">
-            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Path
-          </button>
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="text-[11px] font-semibold text-white/60 uppercase tracking-wider">Endpoint Name</label>
+            <input v-model="newWhName" type="text" class="w-full mt-1 bg-black/50 border border-white/[0.1] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brand-500" placeholder="e.g. Shopify US Store Customers">
+          </div>
+          <div>
+            <label class="text-[11px] font-semibold text-white/60 uppercase tracking-wider">Provider</label>
+            <select v-model="newWhProvider" class="w-full mt-1 bg-black/50 border border-white/[0.1] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brand-500">
+              <option value="shopify">Shopify</option>
+              <option value="meta">Meta / Facebook Lead Ads</option>
+              <option value="stripe">Stripe</option>
+              <option value="generic">Generic JSON Webhook</option>
+            </select>
+          </div>
+          <div class="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] text-white/50 text-[11px] space-y-1">
+            <div class="text-white/80 font-semibold flex items-center gap-1.5">
+              <i data-lucide="key" class="w-3.5 h-3.5 text-emerald-400"></i>
+              API Key Authentication
+            </div>
+            <p>
+              This endpoint does not generate a separate key. It will accept requests authenticated with <strong>any active workspace key</strong> from your <strong>API Keys</strong> list above.
+            </p>
+          </div>
+          <div class="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] text-white/50 text-[11px]">
+            Target: <code class="text-brand-300">/api/public/v1/webhooks/:id</code>. Pre-seeded with mapper template converting <code class="text-white/70">first_name + last_name</code> to Nrtur's single <code class="text-brand-300">name</code> field.
+          </div>
         </div>
-        <button @click="showShareModal = false" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition">Done</button>
+
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button @click="showNewWebhookModal = false" class="px-3 py-1.5 text-xs text-white/50 hover:text-white">Cancel</button>
+          <button @click="createWebhook" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold rounded-xl transition">Create Endpoint</button>
+        </div>
       </div>
     </div>
 
     <!-- Toast Notification -->
-    <div v-if="toastMessage" class="fixed bottom-6 right-6 bg-slate-900 border border-indigo-500/40 text-white text-xs px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 z-50 animate-bounce">
-      <i data-lucide="info" class="w-4 h-4 text-indigo-400"></i>
-      <span>{{ toastMessage }}</span>
+    <div v-if="toastMsg" class="fixed bottom-6 right-6 bg-[#161c28] border border-brand-500/40 text-white text-xs px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 z-50">
+      <i data-lucide="check" class="w-4 h-4 text-emerald-400"></i>
+      <span>{{ toastMsg }}</span>
     </div>
 
   </div>
@@ -543,351 +589,281 @@
 
     createApp({
       setup() {
-        const activeTab = ref('mapper');
+        const activeView = ref('card');
         const selectedPreset = ref('shopify');
-        const targetSchema = ref('Lead');
-        const showNewEndpointModal = ref(false);
-        const showShareModal = ref(false);
-        const toastMessage = ref('');
-        const isPushed = ref(false);
+        const showNewWebhookModal = ref(false);
+        const showDocsDrawer = ref(false);
+        const newWhName = ref('');
+        const newWhProvider = ref('shopify');
+        const newWhKey = ref('create Leads');
+        const toastMsg = ref('');
 
-        // Sample Presets
+        const documentedFields = [
+          { name: "name", required: "Required*", desc: "The lead's full name (single string, max 255 chars). Name or email is required." },
+          { name: "email", required: "Required*", desc: "A valid email address (max 255 chars). Checked against duplicate leads & live contacts." },
+          { name: "phone", required: "Optional", desc: "7 to 15 digits once spaces, dashes, dots, and parentheses are removed." },
+          { name: "company_name", required: "Optional", desc: "Company name as text (max 255 chars)." },
+          { name: "job_title", required: "Optional", desc: "Lead's job title (max 150 chars)." },
+          { name: "source", required: "Optional", desc: "One of: Web form, Referral, Event, Cold outreach, Ad, LinkedIn, Import, API, Facebook. Defaults to 'API'." },
+          { name: "estimated_value", required: "Optional", desc: "Non-negative decimal string e.g. '5000.00' (max 999999999999.99)." },
+          { name: "notes", required: "Optional", desc: "Multi-line text (up to 10,000 chars). Becomes the first note activity on the lead's timeline." },
+        ];
+
+        const webhooks = ref([
+          {
+            id: 'wh_shp_78a1',
+            name: 'Shopify Store Customers',
+            provider: 'shopify',
+            linkedKeyName: 'create Leads',
+            linkedKeyPrefix: 'nrtur_live_Vo0Q...',
+            linkedKeyOwner: 'Qamar Ul Islam',
+            tagColor: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
+            endpointUrl: 'https://api.nrtur.io/api/public/v1/webhooks/wh_shp_78a1',
+            rulesCount: 6,
+            leadsCreated30d: 412
+          },
+          {
+            id: 'wh_fb_882c',
+            name: 'Meta Facebook Lead Ads',
+            provider: 'meta',
+            linkedKeyName: 'create Leads',
+            linkedKeyPrefix: 'nrtur_live_Vo0Q...',
+            linkedKeyOwner: 'Qamar Ul Islam',
+            tagColor: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
+            endpointUrl: 'https://api.nrtur.io/api/public/v1/webhooks/wh_fb_882c',
+            rulesCount: 6,
+            leadsCreated30d: 840
+          },
+          {
+            id: 'wh_str_11b9',
+            name: 'Stripe Checkout Ingestion',
+            provider: 'stripe',
+            linkedKeyName: 'Default key',
+            linkedKeyPrefix: 'nrtur_live_UZ4Y...',
+            linkedKeyOwner: 'Qamar Ul Islam',
+            tagColor: 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20',
+            endpointUrl: 'https://api.nrtur.io/api/public/v1/webhooks/wh_str_11b9',
+            rulesCount: 5,
+            leadsCreated30d: 120
+          }
+        ]);
+
+        const currentEditingWebhook = ref(webhooks.value[0]);
+
+        // Preset payloads representing actual Shopify & Facebook webhook shapes
         const presets = {
           shopify: {
             payload: {
-              "id": 78923411,
-              "event": "customer.created",
+              "id": 89234812,
               "customer": {
-                "first_name": "Hamza",
-                "last_name": "Khan",
-                "email": "hamza.khan@shopmail.com",
-                "phone": "+923001234567",
+                "first_name": "Tariq",
+                "last_name": "Mahmood",
+                "email": "tariq.m@buyermail.com",
+                "phone": "+923009876543",
                 "default_address": {
-                  "city": "Lahore",
-                  "country": "Pakistan"
+                  "company": "Apex Retailers Ltd"
                 },
-                "total_spent": "1450.00"
+                "total_spent": "450.00",
+                "note": "Referred from Instagram Influencer promo"
               }
             },
+            // Mapping explicitly into Nrtur's 8 Lead API fields
             rules: [
-              { targetField: "name", sourcePath: "customer.first_name", transform: "concat", concatWith: "customer.last_name", defaultValue: "Unknown" },
-              { targetField: "email", sourcePath: "customer.email", transform: "none", defaultValue: "" },
-              { targetField: "phone", sourcePath: "customer.phone", transform: "none", defaultValue: "" },
-              { targetField: "city", sourcePath: "customer.default_address.city", transform: "none", defaultValue: "N/A" },
-              { targetField: "budget", sourcePath: "customer.total_spent", transform: "to_number", defaultValue: "0" },
-              { targetField: "source", sourcePath: "event", transform: "uppercase", defaultValue: "SHOPIFY" }
+              { nrturField: "name", sourcePath: "customer.first_name", transform: "concat", concatPath: "customer.last_name", defaultValue: "" },
+              { nrturField: "email", sourcePath: "customer.email", transform: "none", defaultValue: "" },
+              { nrturField: "phone", sourcePath: "customer.phone", transform: "none", defaultValue: "" },
+              { nrturField: "company_name", sourcePath: "customer.default_address.company", transform: "none", defaultValue: "" },
+              { nrturField: "estimated_value", sourcePath: "customer.total_spent", transform: "decimal_string", defaultValue: "0.00" },
+              { nrturField: "source", sourcePath: "", transform: "source_normalize", defaultValue: "API" },
+              { nrturField: "notes", sourcePath: "customer.note", transform: "none", defaultValue: "" }
             ]
           },
-          facebook: {
+          meta: {
             payload: {
               "entry": [
                 {
-                  "id": "104928492019",
-                  "time": 1729851600,
                   "changes": [
                     {
                       "field": "leadgen",
                       "value": {
-                        "leadgen_id": "9988223311",
-                        "form_id": "form_oct_promo",
-                        "full_name": "Ayesha Tariq",
-                        "email": "ayesha.t@metauser.net",
-                        "contact_number": "+923219876543",
-                        "campaign_name": "Autumn Sale 2026",
-                        "estimated_budget": "7500"
+                        "leadgen_id": "meta_lead_9921",
+                        "first_name": "Sarah",
+                        "last_name": "Jenkins",
+                        "email": "sarah.j@cloudscale.io",
+                        "phone_number": "+14155552671",
+                        "company_name": "CloudScale Systems",
+                        "job_title": "Head of Operations",
+                        "campaign_name": "Enterprise Leads Q4",
+                        "lead_notes": "Needs 50 seats by end of month"
                       }
                     }
                   ]
                 }
               ]
             },
+            // Mapping explicitly into Nrtur's 8 Lead API fields
             rules: [
-              { targetField: "name", sourcePath: "entry[0].changes[0].value.full_name", transform: "none", defaultValue: "Lead" },
-              { targetField: "email", sourcePath: "entry[0].changes[0].value.email", transform: "none", defaultValue: "" },
-              { targetField: "phone", sourcePath: "entry[0].changes[0].value.contact_number", transform: "none", defaultValue: "" },
-              { targetField: "city", sourcePath: "entry[0].changes[0].value.city", transform: "none", defaultValue: "Karachi" },
-              { targetField: "budget", sourcePath: "entry[0].changes[0].value.estimated_budget", transform: "to_number", defaultValue: "0" },
-              { targetField: "source", sourcePath: "entry[0].changes[0].value.campaign_name", transform: "none", defaultValue: "Facebook Ads" }
-            ]
-          },
-          custom: {
-            payload: {
-              "partner_id": "crm_alpha",
-              "user_profile": {
-                "display_name": "Bilal Ahmed",
-                "work_email": "bilal@enterprise.co",
-                "mobile": "0333-1122334",
-                "location": "Islamabad",
-                "deal_value": "12000"
-              }
-            },
-            rules: [
-              { targetField: "name", sourcePath: "user_profile.display_name", transform: "none", defaultValue: "" },
-              { targetField: "email", sourcePath: "user_profile.work_email", transform: "none", defaultValue: "" },
-              { targetField: "phone", sourcePath: "user_profile.mobile", transform: "none", defaultValue: "" },
-              { targetField: "city", sourcePath: "user_profile.location", transform: "none", defaultValue: "" },
-              { targetField: "budget", sourcePath: "user_profile.deal_value", transform: "to_number", defaultValue: "0" },
-              { targetField: "source", sourcePath: "partner_id", transform: "uppercase", defaultValue: "PARTNER" }
+              { nrturField: "name", sourcePath: "entry[0].changes[0].value.first_name", transform: "concat", concatPath: "entry[0].changes[0].value.last_name", defaultValue: "" },
+              { nrturField: "email", sourcePath: "entry[0].changes[0].value.email", transform: "none", defaultValue: "" },
+              { nrturField: "phone", sourcePath: "entry[0].changes[0].value.phone_number", transform: "none", defaultValue: "" },
+              { nrturField: "company_name", sourcePath: "entry[0].changes[0].value.company_name", transform: "none", defaultValue: "" },
+              { nrturField: "job_title", sourcePath: "entry[0].changes[0].value.job_title", transform: "none", defaultValue: "" },
+              { nrturField: "source", sourcePath: "", transform: "source_normalize", defaultValue: "Ad" },
+              { nrturField: "notes", sourcePath: "entry[0].changes[0].value.lead_notes", transform: "none", defaultValue: "" }
             ]
           }
         };
 
-        const sourcePayloadText = ref(JSON.stringify(presets.shopify.payload, null, 2));
-        const mappingRules = ref(JSON.parse(JSON.stringify(presets.shopify.rules)));
-        const transformedOutput = ref({});
-        const isValidSourceJson = ref(true);
+        const sourcePayloadJson = ref(JSON.stringify(presets.shopify.payload, null, 2));
+        const nrturRules = ref(JSON.parse(JSON.stringify(presets.shopify.rules)));
+        const transformedLead = ref({});
 
-        // Dynamic Endpoints List
-        const endpoints = ref([
-          {
-            id: 'wh_shopify_leads_9f2a',
-            name: 'Shopify Store Lead Collector',
-            provider: 'shopify',
-            providerColor: 'bg-emerald-600',
-            targetEntity: 'Lead',
-            url: 'https://api.yourdomain.com/api/v1/webhooks/wh_shopify_leads_9f2a',
-            ruleCount: 6,
-            hasHmac: true,
-            isActive: true,
-            callCount: 1420
-          },
-          {
-            id: 'wh_fb_marketing_b18c',
-            name: 'Facebook Ad Leads Campaign',
-            provider: 'facebook',
-            providerColor: 'bg-blue-600',
-            targetEntity: 'Lead',
-            url: 'https://api.yourdomain.com/api/v1/webhooks/wh_fb_marketing_b18c',
-            ruleCount: 6,
-            hasHmac: true,
-            isActive: true,
-            callCount: 890
-          },
-          {
-            id: 'wh_custom_crm_441e',
-            name: 'Partner Alpha CRM Ingestion',
-            provider: 'generic',
-            providerColor: 'bg-purple-600',
-            targetEntity: 'Customer',
-            url: 'https://api.yourdomain.com/api/v1/webhooks/wh_custom_crm_441e',
-            ruleCount: 5,
-            hasHmac: false,
-            isActive: true,
-            callCount: 312
-          }
-        ]);
-
-        const newEp = ref({
-          name: '',
-          provider: 'shopify',
-          targetEntity: 'Lead'
-        });
-
-        // Resolve nested path (e.g. "customer.first_name" or "entry[0].changes[0].value.email")
-        const getValueByPath = (obj, path) => {
+        const resolvePath = (obj, path) => {
           if (!obj || !path) return undefined;
           try {
-            const cleanPath = path.replace(/\[(\w+)\]/g, '.$1').replace(/^\./, '');
-            const keys = cleanPath.split('.');
-            let current = obj;
-            for (const key of keys) {
-              if (current === undefined || current === null) return undefined;
-              current = current[key];
-            }
-            return current;
-          } catch (e) {
+            const clean = path.replace(/\[(\w+)\]/g, '.$1').replace(/^\./, '');
+            return clean.split('.').reduce((acc, k) => (acc ? acc[k] : undefined), obj);
+          } catch(e) {
             return undefined;
           }
         };
 
-        // Run transformation engine
-        const runTransformation = () => {
+        const applyTransformation = () => {
           try {
-            const sourceObj = JSON.parse(sourcePayloadText.value);
-            isValidSourceJson.value = true;
-            const result = {};
+            const src = JSON.parse(sourcePayloadJson.value);
+            const lead = {};
 
-            mappingRules.value.forEach(rule => {
-              let val = getValueByPath(sourceObj, rule.sourcePath);
+            nrturRules.value.forEach(rule => {
+              let val = resolvePath(src, rule.sourcePath);
 
-              // Apply transforms
-              if (rule.transform === 'concat' && rule.concatWith) {
-                const secondVal = getValueByPath(sourceObj, rule.concatWith) || '';
-                val = `${val || ''} ${secondVal}`.trim();
-              } else if (rule.transform === 'uppercase' && typeof val === 'string') {
-                val = val.toUpperCase();
-              } else if (rule.transform === 'lowercase' && typeof val === 'string') {
-                val = val.toLowerCase();
-              } else if (rule.transform === 'to_number') {
-                const parsed = Number(val);
-                val = isNaN(parsed) ? (Number(rule.defaultValue) || 0) : parsed;
+              // Concat rule: Combines first_name + last_name into Nrtur's single 'name'
+              if (rule.transform === 'concat' && rule.concatPath) {
+                const extra = resolvePath(src, rule.concatPath) || '';
+                val = `${val || ''} ${extra}`.trim();
+              } else if (rule.transform === 'decimal_string' && val !== undefined) {
+                const cleaned = String(val).replace(/[$,]/g, '').trim();
+                const n = Number.parseFloat(cleaned);
+                val = isNaN(n) ? "0.00" : n.toFixed(2);
+              } else if (rule.transform === 'source_normalize') {
+                val = rule.defaultValue || "API";
               }
 
-              // Fallback default
               if (val === undefined || val === null || val === '') {
-                val = rule.defaultValue !== undefined ? rule.defaultValue : null;
+                val = rule.defaultValue !== undefined && rule.defaultValue !== "" ? rule.defaultValue : null;
               }
 
-              result[rule.targetField] = val;
+              // Nrtur backend rule: every field must be a JSON string or null
+              if (val !== null) {
+                val = String(val);
+              }
+
+              lead[rule.nrturField] = val;
             });
 
-            // Metadata tag
-            result['_ingestedAt'] = new Date().toISOString();
-            result['_schemaVersion'] = "1.0.0";
-            transformedOutput.value = result;
-          } catch (err) {
-            isValidSourceJson.value = false;
+            transformedLead.value = lead;
+          } catch(e) {}
+        };
+
+        const loadPreset = (type) => {
+          selectedPreset.value = type;
+          sourcePayloadJson.value = JSON.stringify(presets[type].payload, null, 2);
+          nrturRules.value = JSON.parse(JSON.stringify(presets[type].rules));
+          applyTransformation();
+          triggerToast(`Loaded ${type.toUpperCase()} preset`);
+        };
+
+        const openMapperStudio = (wh) => {
+          currentEditingWebhook.value = wh;
+          if (presets[wh.provider]) {
+            loadPreset(wh.provider);
           }
-        };
-
-        const onSourcePayloadChange = () => {
-          runTransformation();
-        };
-
-        const formatSourceJson = () => {
-          try {
-            const parsed = JSON.parse(sourcePayloadText.value);
-            sourcePayloadText.value = JSON.stringify(parsed, null, 2);
-            isValidSourceJson.value = true;
-          } catch(e) {
-            triggerToast('Invalid JSON syntax');
-          }
-        };
-
-        const loadPreset = (key) => {
-          selectedPreset.value = key;
-          sourcePayloadText.value = JSON.stringify(presets[key].payload, null, 2);
-          mappingRules.value = JSON.parse(JSON.stringify(presets[key].rules));
-          runTransformation();
-          triggerToast(`Loaded ${key.toUpperCase()} sample payload & rules`);
-        };
-
-        const addNewRule = () => {
-          mappingRules.value.push({
-            targetField: "custom_field_" + (mappingRules.value.length + 1),
-            sourcePath: "",
-            transform: "none",
-            defaultValue: ""
-          });
+          activeView.value = 'studio';
           nextTick(() => lucide.createIcons());
         };
 
-        const removeRule = (idx) => {
-          mappingRules.value.splice(idx, 1);
-          runTransformation();
+        const saveMapping = () => {
+          currentEditingWebhook.value.rulesCount = nrturRules.value.length;
+          triggerToast(`Mapping saved for ${currentEditingWebhook.value.name}`);
         };
 
-        const resetToDefaultRules = () => {
-          if (presets[selectedPreset.value]) {
-            mappingRules.value = JSON.parse(JSON.stringify(presets[selectedPreset.value].rules));
-            runTransformation();
-          }
-        };
-
-        const createEndpoint = () => {
-          if (!newEp.value.name) return;
-          const randomId = 'wh_' + newEp.value.provider + '_' + Math.random().toString(36).substring(2, 7);
+        const createWebhook = () => {
+          if (!newWhName.value) return;
+          const id = 'wh_' + newWhProvider.value.slice(0, 3) + '_' + Math.random().toString(36).substring(2, 6);
           const colorMap = {
-            shopify: 'bg-emerald-600',
-            facebook: 'bg-blue-600',
-            stripe: 'bg-indigo-600',
-            generic: 'bg-purple-600'
+            shopify: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
+            meta: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
+            stripe: 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20',
+            generic: 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
           };
-          endpoints.value.unshift({
-            id: randomId,
-            name: newEp.value.name,
-            provider: newEp.value.provider,
-            providerColor: colorMap[newEp.value.provider] || 'bg-slate-700',
-            targetEntity: newEp.value.targetEntity,
-            url: `https://api.yourdomain.com/api/v1/webhooks/${randomId}`,
-            ruleCount: mappingRules.value.length,
-            hasHmac: true,
-            isActive: true,
-            callCount: 0
+          webhooks.value.unshift({
+            id: id,
+            name: newWhName.value,
+            provider: newWhProvider.value,
+            tagColor: colorMap[newWhProvider.value] || 'bg-slate-500/10 text-slate-400 border border-slate-500/20',
+            endpointUrl: `https://api.nrtur.io/api/public/v1/webhooks/${id}`,
+            rulesCount: 6,
+            leadsCreated30d: 0
           });
-          showNewEndpointModal.value = false;
-          triggerToast(`Endpoint created: ${randomId}`);
-          newEp.value.name = '';
+          showNewWebhookModal.value = false;
+          newWhName.value = '';
+          triggerToast(`Created endpoint ${id}. Uses your workspace API keys.`);
           nextTick(() => lucide.createIcons());
         };
 
-        const loadEndpointIntoMapper = (ep) => {
-          activeTab.value = 'mapper';
-          if (presets[ep.provider]) {
-            loadPreset(ep.provider);
-          }
-          triggerToast(`Loaded mapping for ${ep.name}`);
+        const copy = (txt) => {
+          navigator.clipboard.writeText(txt);
+          triggerToast('Endpoint URL copied to clipboard');
         };
 
-        const testEndpoint = (ep) => {
-          ep.callCount++;
-          triggerToast(`Simulated incoming webhook to ${ep.id} (200 OK)`);
+        const simulateWebhookDelivery = (wh) => {
+          wh.leadsCreated30d++;
+          triggerToast(`Webhook payload to ${wh.id} mapped into Nrtur Lead → 201 Created`);
         };
 
-        const copyToClipboard = (text) => {
-          navigator.clipboard.writeText(text);
-          triggerToast('Copied to clipboard!');
+        const simulateCreateLead = () => {
+          triggerToast('CreateViaLeadAPI executed: Lead created & timeline note attached (201 Created)');
         };
 
         const triggerToast = (msg) => {
-          toastMessage.value = msg;
-          setTimeout(() => {
-            if (toastMessage.value === msg) toastMessage.value = '';
-          }, 3000);
+          toastMsg.value = msg;
+          setTimeout(() => { if (toastMsg.value === msg) toastMsg.value = ''; }, 3200);
           nextTick(() => lucide.createIcons());
         };
 
-        const simulatePushToDatabase = () => {
-          isPushed.value = true;
-          triggerToast('Entity validated and inserted into DB!');
-          setTimeout(() => { isPushed.value = false; }, 3500);
-        };
-
-        const detectedFieldCount = computed(() => {
-          try {
-            const obj = JSON.parse(sourcePayloadText.value);
-            return Object.keys(obj).length;
-          } catch(e) {
-            return 0;
-          }
-        });
-
-        const formattedTransformedOutput = computed(() => {
-          return JSON.stringify(transformedOutput.value, null, 2);
+        // Nrtur validation rule: Name or Email is required
+        const isLeadValid = computed(() => {
+          const l = transformedLead.value;
+          return Boolean((l.name && l.name.trim()) || (l.email && l.email.trim()));
         });
 
         onMounted(() => {
-          runTransformation();
+          applyTransformation();
           lucide.createIcons();
         });
 
         return {
-          activeTab,
+          activeView,
           selectedPreset,
-          targetSchema,
-          sourcePayloadText,
-          mappingRules,
-          isValidSourceJson,
-          detectedFieldCount,
-          formattedTransformedOutput,
-          endpoints,
-          newEp,
-          showNewEndpointModal,
-          showShareModal,
-          toastMessage,
-          isPushed,
+          showNewWebhookModal,
+          showDocsDrawer,
+          documentedFields,
+          newWhName,
+          newWhProvider,
+          newWhKey,
+          webhooks,
+          currentEditingWebhook,
+          sourcePayloadJson,
+          nrturRules,
+          transformedLead,
+          isLeadValid,
+          toastMsg,
           loadPreset,
-          formatSourceJson,
-          onSourcePayloadChange,
-          addNewRule,
-          removeRule,
-          resetToDefaultRules,
-          runTransformation,
-          createEndpoint,
-          loadEndpointIntoMapper,
-          testEndpoint,
-          copyToClipboard,
-          simulatePushToDatabase
+          openMapperStudio,
+          saveMapping,
+          createWebhook,
+          copy,
+          simulateWebhookDelivery,
+          simulateCreateLead
         };
       }
     }).mount('#app');
